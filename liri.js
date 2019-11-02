@@ -154,7 +154,7 @@ function retrieveOMDBMovieInfo() {
   // If statement to check if process.argv[3] is defined, then set movieName to be equal to that custom movie by User
   if (input_variable != undefined) {
     // console.log("input: " + input_variable);
-    
+
     movieName = input_variable;
 
     //loop through the arg array until there aren't any more arguments
@@ -164,18 +164,18 @@ function retrieveOMDBMovieInfo() {
       //add each arg to the movieName var to use in the QueryURL
       movieName = movieName + "+" + process.argv[i];
 
-        console.log(movieName);
+      console.log(movieName);
     }
   }
 
   var omdbQueryURL =
-  "http://www.omdbapi.com/?apikey=trilogy&t=" + movieName + "%5C";
+    "http://www.omdbapi.com/?apikey=trilogy&t=" + movieName + "%5C";
 
   axios
     .get(omdbQueryURL)
     .then(function(response) {
-        var result = response.data;
-      // If axios was successful, log following info: 
+      var result = response.data;
+      // If axios was successful, log following info:
       // Title of the movie.
       console.log("Movie Title: " + result.Title);
       // Year the movie came out.
@@ -213,25 +213,49 @@ function retrieveOMDBMovieInfo() {
     });
 }
 
-// Search the OMDB API for a movie
-// If no movie input, then default movie is: "Mr. Nobody."
-// EX URL: http://www.omdbapi.com/?t=Mr.+Nobody.%5C
-
 // `do-what-it-says` Command
 // "node liri.js do-what-it-says"
 // Import the `fs` Node package into a variable
 var fs = require("fs");
 
-// LIRI will take the text inside of random.txt and then use it to call one of LIRI's commands.
+function retrieveCustomRandomInstruction() {
+  // Read the file
+  fs.readFile("random.txt", "utf8", function(error, data) {
+    // If there is an error
+    if (error) {
+      return console.log(error);
+    }
+    // If read was successful
+    console.log("Successfully read the file.");
+    console.log(data);
 
-// It should run `spotify-this-song` for "I Want it That Way," as follows the text in `random.txt`.
+    // Read the contents of the data by parsing into its distinct parts, assign it to new variable
+    var customLIRICommandArray = data.split(",");
 
-// Read the file
+    // Check the newly parsed array to see how it is structured, want to check that it was parsed into: a command and an item-of-interest
+    console.log(customLIRICommandArray);
 
-// Parse by the "," into two parts: actionType and itemName
+    // Create new variables for these two array items
+    var custom_function;   // Need assignment
+    var custom_item;       // Need assignment
 
-// Edit the text in random.txt to test out the feature for movie-this and concert-this.
-function retrieveCustomRandomInstruction() {}
+    // Create a switch statement that focuses in on the action/command item of the array, run the respective command on the item-of-interest
+    switch (custom_function, custom_item) {
+      // Bands in Town
+      case "concert-this":
+        retrievBITArtistEvents(custom_item);
+        break;
+      // Spotify
+      case "spotify-this-song":
+        retrieveSpotifySongInfo(custom_item);
+        break;
+      // OMDB
+      case "movie-this":
+        retrieveOMDBMovieInfo(custom_item);
+        break;
+    }
+  });
+}
 
 // Create a switch:case function that will read what the user has put as action-function in at process.argv[2]
 switch (action_function) {
