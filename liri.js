@@ -9,6 +9,7 @@ var filePath = process.argv[1];
 var artistName = "kanye+west";
 var songName = "The Sign";
 var movieName = "Mr. Nobody";
+var customLIRICommandArray;
 
 // Establish variables for action-function and input-variable
 var action_function = process.argv[2];
@@ -35,7 +36,7 @@ function retrievBITArtistEvents(itemInterest) {
 
     //loop through the arg array until there aren't any more arguments
     for (var i = 4; process.argv[i] != undefined; i++) {
-      console.log("inside for loop in spotify");
+      // console.log("inside for loop in spotify");
 
       //add each arg to the artistName var to use in the QueryURL
       itemInterest += "+" + process.argv[i];
@@ -102,24 +103,53 @@ var keys = require("./key.js");
 // Create variable for access for Spotify
 var spotify = new Spotify(keys.spotify_key);
 
-function retrieveSpotifySongInfo(itemInterest) {
+function retrieveSpotifySongInfo() {
   // Search the Spotify API for a song
   // If no song, default song is: "The Sign" by Ace of Base
-  // If statement to check if process.argv[3] is defined, then set songName to be equal to that custom song by User
+  // If statement to check if process.argv[3] is defined, then set songName to be equal to that custom song by User  
   if (input_variable != undefined) {
     // console.log("input: " + input_variable);
-    artistName = input_variable;
+    songName = input_variable;
 
     //loop through the arg array until there aren't any more arguments
-    for (var i = 4; process.argv[i] != undefined; i++) {
+    for (var i = 3; process.argv[i] != undefined; i++) {
       //   console.log("inside for loop in spotify");
 
       //add each arg to the movieName var to use in the QueryURL
-      itemInterest += "+" + process.argv[i];
+      songName += "+" + process.argv[i];
 
       //   console.log(songName);
     }
   }
+
+  var spotifySearchParameters = {
+    type: "track",
+    query: songName,
+    limit: "1"
+  };
+
+    console.log(spotifySearchParameters);
+
+  spotify
+    .search(spotifySearchParameters)
+    .then(function(response) {
+      // render the following information about the song:
+      // Artist(s)
+      console.log("Artist: " + response.tracks.items[0].album.artists[0].name);
+      // The song's name
+      console.log("Song Name: " + response.tracks.items[0].name);
+      // A preview link of the song from Spotify
+      console.log("Song Preview URL: " + response.tracks.items[0].preview_url);
+      // The album that the song is from
+      console.log("Off Album Name: " + response.tracks.items[0].album.name);
+    })
+    .catch(function(err) {
+      console.log(err);
+    });
+}
+
+function retrieveSpotifySongInfoCustom(itemInterest) {
+  // Search the Spotify API for a custom song
 
   var spotifySearchParameters = {
     type: "track",
@@ -146,6 +176,7 @@ function retrieveSpotifySongInfo(itemInterest) {
       console.log(err);
     });
 }
+
 
 // "movie-this" Command
 // "node liri.js movie-this '<movie name here>"
@@ -231,14 +262,14 @@ function retrieveCustomRandomInstruction() {
     // console.log(data);
 
     // Read the contents of the data by parsing into its distinct parts, assign it to new variable
-    var customLIRICommandArray = data.split(",");
+    customLIRICommandArray = data.split(",");
 
     // Check the newly parsed array to see how it is structured, want to check that it was parsed into: a command and an item-of-interest
     console.log(customLIRICommandArray);
 
     // Create new variables for these two array items
     var custom_function = customLIRICommandArray[0].toString().trim();   
-    var custom_item = customLIRICommandArray[1].toString().trim();       
+    var custom_item = customLIRICommandArray[1].toString().trim().replace(/ /g, '+');   
 
     console.log(custom_function);
     console.log(custom_item);
@@ -251,7 +282,7 @@ function retrieveCustomRandomInstruction() {
         break;
       // Spotify
       case "spotify-this-song":
-        retrieveSpotifySongInfo(custom_item);
+        retrieveSpotifySongInfoCustom(custom_item);
         break;
       // OMDB
       case "movie-this":
