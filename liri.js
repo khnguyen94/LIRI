@@ -24,29 +24,30 @@ var input_variable = process.argv[3];
 const axios = require("axios");
 const moment = require("moment");
 
-function retrievBITArtistEvents() {
+function retrievBITArtistEvents(itemInterest) {
   // Search the BIT API for artist event
   // If no artist, default artist is: "Kanye West"
   // If statement to check if process.argv[3] is defined, then set artistName to be equal to that custom song by User
+  
   if (input_variable != undefined) {
     // console.log("input: " + input_variable);
-    artistName = input_variable;
+    itemInterest = input_variable;
 
     //loop through the arg array until there aren't any more arguments
     for (var i = 4; process.argv[i] != undefined; i++) {
       console.log("inside for loop in spotify");
 
       //add each arg to the artistName var to use in the QueryURL
-      artistName += "+" + process.argv[i];
+      itemInterest += "+" + process.argv[i];
 
-      console.log(artistName);
+      console.log(itemInterest);
     }
   }
 
   // Define queryURL
   var bandsInTownQueryURL =
     "https://rest.bandsintown.com/artists/" +
-    artistName +
+    itemInterest +
     "/events?app_id=codingbootcamp?date=upcoming";
 
   console.log(bandsInTownQueryURL);
@@ -58,9 +59,9 @@ function retrievBITArtistEvents() {
     .then(function(response) {
       var results = response.data;
 
-      console.log(" \n These are the 5 upcoming concerts for this artist: \n");
+      console.log(" \n These are the upcoming concerts for this artist: \n");
 
-      for (var i = 0; i < 5; i++) {
+      for (var i = 0; i < results.length; i++) {
         console.log("\n Concert" + (i + 1) + ": ");
         // Venue name
         console.log("\n" + results[i].venue.name);
@@ -101,20 +102,20 @@ var keys = require("./key.js");
 // Create variable for access for Spotify
 var spotify = new Spotify(keys.spotify_key);
 
-function retrieveSpotifySongInfo() {
+function retrieveSpotifySongInfo(itemInterest) {
   // Search the Spotify API for a song
   // If no song, default song is: "The Sign" by Ace of Base
   // If statement to check if process.argv[3] is defined, then set songName to be equal to that custom song by User
   if (input_variable != undefined) {
     // console.log("input: " + input_variable);
-    songName = input_variable;
+    artistName = input_variable;
 
     //loop through the arg array until there aren't any more arguments
     for (var i = 4; process.argv[i] != undefined; i++) {
       //   console.log("inside for loop in spotify");
 
       //add each arg to the movieName var to use in the QueryURL
-      songName = songName + "+" + process.argv[i];
+      itemInterest += "+" + process.argv[i];
 
       //   console.log(songName);
     }
@@ -122,11 +123,11 @@ function retrieveSpotifySongInfo() {
 
   var spotifySearchParameters = {
     type: "track",
-    query: songName,
+    query: itemInterest,
     limit: "1"
   };
 
-  //   console.log(spotifySearchParameters);
+    console.log(spotifySearchParameters);
 
   spotify
     .search(spotifySearchParameters)
@@ -149,7 +150,7 @@ function retrieveSpotifySongInfo() {
 // "movie-this" Command
 // "node liri.js movie-this '<movie name here>"
 
-function retrieveOMDBMovieInfo() {
+function retrieveOMDBMovieInfo(itemInterest) {
   // If no movie, default movie is: "Mr. Nobody"
   // If statement to check if process.argv[3] is defined, then set movieName to be equal to that custom movie by User
   if (input_variable != undefined) {
@@ -162,14 +163,14 @@ function retrieveOMDBMovieInfo() {
       //   console.log("inside for loop in spotify");
 
       //add each arg to the movieName var to use in the QueryURL
-      movieName = movieName + "+" + process.argv[i];
+      itemInterest += "+" + process.argv[i];
 
-      console.log(movieName);
+      console.log(itemInterest);
     }
   }
 
   var omdbQueryURL =
-    "http://www.omdbapi.com/?apikey=trilogy&t=" + movieName + "%5C";
+    "http://www.omdbapi.com/?apikey=trilogy&t=" + itemInterest + "%5C";
 
   axios
     .get(omdbQueryURL)
@@ -227,7 +228,7 @@ function retrieveCustomRandomInstruction() {
     }
     // If read was successful
     console.log("Successfully read the file.");
-    console.log(data);
+    // console.log(data);
 
     // Read the contents of the data by parsing into its distinct parts, assign it to new variable
     var customLIRICommandArray = data.split(",");
@@ -236,11 +237,14 @@ function retrieveCustomRandomInstruction() {
     console.log(customLIRICommandArray);
 
     // Create new variables for these two array items
-    var custom_function;   // Need assignment
-    var custom_item;       // Need assignment
+    var custom_function = customLIRICommandArray[0].toString().trim();   
+    var custom_item = customLIRICommandArray[1].toString().trim();       
+
+    console.log(custom_function);
+    console.log(custom_item);
 
     // Create a switch statement that focuses in on the action/command item of the array, run the respective command on the item-of-interest
-    switch (custom_function, custom_item) {
+    switch (custom_function) {
       // Bands in Town
       case "concert-this":
         retrievBITArtistEvents(custom_item);
